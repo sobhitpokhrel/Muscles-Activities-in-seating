@@ -1,0 +1,34 @@
+Matlab code for calculating Percentile MVC
+% Load the data from the Excel sheets with sheet names
+activityData = xlsread('R.xlsx', 'Sheet1'); 
+mvcData = xlsread('MVC 4.xlsx', 'Sheet1'); 
+
+% Extract muscle data from activity data
+leftBack = activityData(:, 2);
+rightBack = activityData(:, 3);
+leftTrap = activityData(:, 4);
+rightTrap = activityData(:, 5);
+
+% Calculate percentiles for activity data
+percentiles = [10, 50, 90];
+percentileValues = prctile([leftBack, rightBack, leftTrap, rightTrap], percentiles);
+
+% Extract muscle data from MVC data
+mvcLeftBack = mvcData(:, 2);
+mvcRightBack = mvcData(:, 3);
+mvcLeftTrap = mvcData(:, 4);
+mvcRightTrap = mvcData(:, 5);
+
+% Calculate 95th percentile for MVC data
+mvc95th = prctile([mvcLeftBack, mvcRightBack, mvcLeftTrap, mvcRightTrap], 95);
+
+% Calculate %MVC for 10th, 50th, and 90th percentiles
+percentileMVC = (percentileValues ./ mvc95th) * 100;
+
+% Create a table for the results
+resultTable = table(percentiles', percentileValues', percentileMVC(:, 1), percentileMVC(:, 2), percentileMVC(:, 3), percentileMVC(:, 4), ...
+    'VariableNames', {'Percentile', 'Activity_Values', 'LeftBack_%MVC', 'RightBack_%MVC', 'LeftTrap_%MVC', 'RightTrap_%MVC'});
+
+% Write the table to a CSV file
+writetable(resultTable, 'percentile_results.csv');
+
